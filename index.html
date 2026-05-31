@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MoSim Robot Builder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>MoSim Robot Builder</h1>
+
+<div class="panel">
+    <label>Robot Name</label>
+    <input id="robotName" value="MyRobot">
+
+    <label>Drivetrain</label>
+    <select id="drivetrain">
+        <option>Tank</option>
+        <option>Swerve</option>
+        <option>Mecanum</option>
+    </select>
+
+    <label>Frame Length</label>
+    <input id="length" type="number" value="28">
+
+    <label>Frame Width</label>
+    <input id="width" type="number" value="28">
+
+    <h3>Mechanisms</h3>
+
+    <label>
+        <input id="arm" type="checkbox">
+        Arm
+    </label>
+
+    <label>
+        <input id="elevator" type="checkbox">
+        Elevator
+    </label>
+
+    <label>
+        <input id="intake" type="checkbox" checked>
+        Intake
+    </label>
+
+    <button onclick="generateRobot()">Generate</button>
+    <button onclick="exportRobot()">Export JSON</button>
+</div>
+
+<canvas id="robotCanvas" width="800" height="500"></canvas>
+
+<script src="app.js"></script>
+
+</body>
+</html>
