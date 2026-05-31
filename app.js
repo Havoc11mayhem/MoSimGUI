@@ -1,69 +1,102 @@
-let robot = {};
+import * as THREE from 'https://unpkg.com/three@0.165.0/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three@0.165.0/examples/jsm/controls/OrbitControls.js';
+import { DragControls } from 'https://unpkg.com/three@0.165.0/examples/jsm/controls/DragControls.js';
 
-function generateRobot() {
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x222222);
 
-    robot = {
-        name: document.getElementById("robotName").value,
-        drivetrain: document.getElementById("drivetrain").value,
-        length: Number(document.getElementById("length").value),
-        width: Number(document.getElementById("width").value),
+const camera = new THREE.PerspectiveCamera(
+    70,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
 
-        mechanisms: {
-            arm: document.getElementById("arm").checked,
-            elevator: document.getElementById("elevator").checked,
-            intake: document.getElementById("intake").checked
-        }
-    };
+camera.position.set(5, 5, 8);
 
-    drawRobot();
-}
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-function drawRobot() {
+document.getElementById("viewport")
+    .appendChild(renderer.domElement);
 
-    const canvas = document.getElementById("robotCanvas");
-    const ctx = canvas.getContext("2d");
+const controls = new OrbitControls(camera, renderer.domElement);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+const light = new THREE.DirectionalLight(0xffffff, 3);
+light.position.set(5, 10, 5);
+scene.add(light);
 
-    const scale = 10;
+scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-    const x = canvas.width / 2;
-    const y = canvas.height / 2;
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial()
+);
 
-    const w = robot.width * scale;
-    const l = robot.length * scale;
+floor.rotation.x = -Math.PI / 2;
+scene.add(floor);
 
-    ctx.strokeRect(
-        x - w / 2,
-        y - l / 2,
-        w,
-        l
+const draggableObjects = [];
+
+let dragControls =
+    new DragControls(
+        draggableObjects,
+        camera,
+        renderer.domElement
     );
 
-    if (robot.mechanisms.arm) {
-        ctx.fillRect(x - 15, y - 60, 30, 60);
+window.addPart = function(type) {
+
+    let geometry;
+
+    switch(type) {
+
+        case "motor":
+            geometry = new THREE.CylinderGeometry(0.3,0.3,1);
+            break;
+
+        case "gear":
+            geometry = new THREE.CylinderGeometry(0.5,0.5,0.15,24);
+            break;
+
+        case "wheel":
+            geometry = new THREE.CylinderGeometry(0.6,0.6,0.4,32);
+            break;
+
+        case "tube":
+            geometry = new THREE.BoxGeometry(1,0.2,0.2);
+            break;
+
+        case "plate":
+            geometry = new THREE.BoxGeometry(1,0.1,1);
+            break;
     }
 
-    if (robot.mechanisms.elevator) {
-        ctx.fillRect(x + 40, y - 80, 20, 80);
-    }
-
-    if (robot.mechanisms.intake) {
-        ctx.fillRect(x - 50, y + l / 2 - 10, 100, 20);
-    }
-}
-
-function exportRobot() {
-
-    const blob = new Blob(
-        [JSON.stringify(robot, null, 2)],
-        { type: "application/json" }
+    const part = new THREE.Mesh(
+        geometry,
+        new THREE.MeshStandardMaterial()
     );
 
-    const link = document.createElement("a");
+    part.position.y = 0.5;
 
-    link.href = URL.createObjectURL(blob);
-    link.download = robot.name + ".json";
+    scene.add(part);
+    draggableObjects.push(part);
 
-    link.click();
+    dragControls.dispose();
+
+    dragControls = new DragControls(
+        draggableObjects,
+        camera,
+        renderer.domElement
+    );
+};
+
+function animate() {
+
+    requestAnimationFrame(animate);
+
+    controls.update();
+    renderer.render(scene, camera);
 }
+
+animate();

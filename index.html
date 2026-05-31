@@ -3,6 +3,7 @@
 <head>
     <title>MoSim Robot Builder</title>
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="app.js"></script>
 </head>
 <body>
 
@@ -26,7 +27,13 @@
     <input id="width" type="number" value="28">
 
     <h3>Mechanisms</h3>
-
+    <div id="toolbar">
+    <button onclick="addPart('motor')">Motor</button>
+    <button onclick="addPart('gear')">Gear</button>
+    <button onclick="addPart('wheel')">Wheel</button>
+    <button onclick="addPart('tube')">Tubing</button>
+    <button onclick="addPart('plate')">Plate</button>
+</div>
     <label>
         <input id="arm" type="checkbox">
         Arm
